@@ -4,9 +4,10 @@ import os, re
 
 
 
-from MSBRvsbr import main as MV
-from MSBRvsbr import create_output
-from randomizer import create_new as Token
+from func.MSBR import main as MSBR
+from func.VSBR import main as VSBR
+from func.output import create_output
+from func.randomizer import create_new as Token
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -39,7 +40,7 @@ def index():
         
         file = request.files['file']
         
-        
+        choice = request.form.get('choice')
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
@@ -48,8 +49,10 @@ def index():
             filename = file.filename
             f_filename = f"{Token()}_{filename}"
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_filename))
-            
-            create_output(MV(f_filename), re.sub('txt','xlsx', f_filename))
+            if choice == "MSBR":
+                create_output(MSBR(f_filename), re.sub('txt','xlsx', f_filename))
+            else:
+                create_output(VSBR(f_filename), re.sub('txt','xlsx', f_filename))
             flash('File uploaded successfully')
             return redirect(url_for('index'))
         else:
