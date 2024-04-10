@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file,send_from_directory, abort
 from flask_bootstrap import Bootstrap
 import os, re
 
@@ -50,11 +50,16 @@ def index():
             f_filename = f"{Token()}_{filename}"
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_filename))
             if choice == "MSBR":
-                create_output(MSBR(f_filename), re.sub('txt','xlsx', f_filename))
+                oName = re.sub('txt','xlsx', f_filename)
+                create_output(MSBR(f_filename), oName)
+                return send_from_directory(app.config["DOWNLOADS"], oName)
             else:
-                create_output(VSBR(f_filename), re.sub('txt','xlsx', f_filename))
-            flash('File uploaded successfully')
-            return redirect(url_for('index'))
+                oName = re.sub('txt','xlsx', f_filename)
+                create_output(VSBR(f"./uploads/{f_filename}"),oName )
+                return send_from_directory(app.config["DOWNLOADS"], oName)
+                
+            # flash('File uploaded successfully')
+            # return redirect(url_for('index'))
         else:
             flash('File type not allowed')
             return redirect(request.url)
@@ -66,9 +71,12 @@ def index():
 
 attachments_dir = './outputs/'
 
-@app.route('/download_attachment/<filename>')
+@app.route('/download_attachment/<path:filename>')
 def download_attachment(filename):
-    attachment_path = os.path.join(attachments_dir, filename)
+    try:
+        return send_from_directory(attachments_dir, filename=filename, as_attachment=False)
+    except FileNotFoundError:
+        abort(404)
     
     print(os.listdir(attachments_dir))
 

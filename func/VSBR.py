@@ -19,7 +19,7 @@ def get_details(all_no) -> list:
             try:
                 c_Out = call_out(dt)[1]
                 c_In = call_in(dt, c_Out)[1]
-                subNo, subSts, adSts, cOut, cIn, supSer = dt[18],dt[28],dt[29], call_out(dt)[0], call_in(dt,c_Out)[0], dt[c_In+3]
+                subNo, subSts, adSts, cOut, cIn, supSer = dt[18],dt[28],dt[29], "\n".join(call_out(dt)[0]), "\n".join(call_in(dt,c_Out)[0]), dt[c_In+3]
                 
 
                 out_det.append((subNo, subSts, adSts, cOut, cIn, supSer))
